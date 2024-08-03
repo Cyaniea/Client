@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from models import db
@@ -14,6 +14,10 @@ jwt = JWTManager(app)
 
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(reservations, url_prefix='/api')
+
+@app.route('/')
+def home():
+    return jsonify({"message": "Welcome to Wedding Reservation API"})
 
 if __name__ == '__main__':
     with app.app_context():
