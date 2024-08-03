@@ -1,19 +1,21 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+from models import db
+from routes.auth import auth
+from routes.reservations import reservations
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'SECRET'
 CORS(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wedding.db'
+app.config['JWT_SECRET_KEY'] = 'your-secret-key'  # Ganti dengan kunci rahasia yang aman
+db.init_app(app)
+jwt = JWTManager(app)
 
-@app.route("/")
-def index():
-    return render_template("name.html", title='Makan Gigi')
-
-
-@app.route('/base', methods=['POST'])
-def submit_name():
-    name = request.form['name']
-    return render_template("base.html", title='Welcome', name=name)
+app.register_blueprint(auth, url_prefix='/auth')
+app.register_blueprint(reservations, url_prefix='/api')
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
